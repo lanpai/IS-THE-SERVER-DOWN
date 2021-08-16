@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <meta name="description" content="Checks if the various piyo.cafe services are down.">
+
+        <meta property="og:title" content="IS THE SERVER DOWN?">
+
+        <title>IS THE SEREVR DOWN?</title>
+
+<style>
+body {
+    background-color: #931d33;
+    color: #d2c4bc;
+    font-family: sans-serif;
+    margin: 0;
+}
+
+h1, i {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.loading, .main, .error {
+    position: absolute;
+    top: 0;
+    width: calc(100% - 20px);
+    min-height: 100vh;
+    padding: 10px;
+
+    visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    transition: opacity 200ms;
+    opacity: 0;
+}
+@keyframes loading {
+    from {
+        opacity: 0.7;
+    }
+    to {
+        opacity: 1;
+    }
+}
+.loading {
+    visibility: visible;
+    opacity: 0.7;
+    animation: 1s ease-in-out 1s infinite alternate loading;
+}
+
+::selection {
+    color: #931d33;
+    background: #d2c4bc;
+}
+::-moz-selection {
+    color: #931d33;
+    background: #d2c4bc;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: min-content min-content;
+    grid-auto-rows: min-content;
+}
+.item {
+    display: inline-grid;
+    margin: 0 10px;
+    font-size: 1.3em;
+}
+.item:nth-child(odd) {
+    text-align: right;
+}
+.item:nth-child(even) {
+    text-align: left;
+    font-weight: bold;
+}
+</style>
+    </head>
+
+    <body>
+        <div class="loading">
+            <h1>PROBING SERVERS...</h1>
+        </div>
+        <div class="main">
+            <h1>IS THE SERVER DOWN?*</h1>
+            <div class="container">
+            </div>
+            <i>*according to cloudflare workers servers</i>
+        </div>
+        <div class="error">
+            <h1>IS THE SERVER DOWN?</h1>
+            <i>unable to connect to cloudflare workers servers (maybe your internet is down?)</i>
+        </div>
+
+        <script>
+            fetch('https://status.piyocafe.workers.dev/status')
+                .then((res) => res.json())
+                .then((res) => {
+                    for (key in res) {
+                        elemKey = document.createElement('div');
+                        elemKey.className = 'item';
+                        elemKey.innerHTML = key;
+
+                        elemVal = document.createElement('div');
+                        elemVal.className = 'item';
+                        elemVal.innerHTML = res[key] ? 'UP' : 'DOWN';
+
+                        document.getElementsByClassName('container')[0].appendChild(elemKey);
+                        document.getElementsByClassName('container')[0].appendChild(elemVal);
+                    }
+                    document.getElementsByClassName('main')[0].style.visibility = 'visible';
+                    document.getElementsByClassName('main')[0].style.opacity = 1;
+                    document.getElementsByClassName('loading')[0].style.visibility = 'hidden';
+                    document.getElementsByClassName('loading')[0].style.opacity = 0;
+                })
+            .catch((err) => {
+                document.getElementsByClassName('error')[0].style.visibility = 'visible';
+                document.getElementsByClassName('error')[0].style.opacity = 1;
+                document.getElementsByClassName('loading')[0].style.visibility = 'hidden';
+                document.getElementsByClassName('loading')[0].style.opacity = 0;
+            });
+        </script>
+    </body>
+</html>
